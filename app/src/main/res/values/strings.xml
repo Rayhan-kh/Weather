@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Weather</string>
+    <string name="Internet">Please turn to Mobile Data or WIFI</string>
+    <string name="noInternet">No Internet</string>
+    <string name="try_different_city">Try Different City</string>
+    <string name="invalidCIty">Invalid city name</string>
+    <string name="location_error">Location Error</string>
+    <string name="todat">Today</string>
 </resources>
