@@ -153,9 +153,7 @@ public class HomeActivity extends AppCompatActivity {
             }
             else {
                 final EditText editText=new EditText(this);
-                editText.setLeft(10);
-                editText.setRight(10);
-                alert.setTitle("Enter City Name")
+                alert.setTitle("Enter City")
                         .setView(editText)
                         .setPositiveButton("Enter", new DialogInterface.OnClickListener() {
                             @Override
@@ -171,7 +169,7 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             alert.setTitle(R.string.noInternet)
                     .setMessage(R.string.Internet)
-                    .setPositiveButton("Try Later", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(R.string.tryAgain, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                         }
@@ -184,6 +182,7 @@ public class HomeActivity extends AppCompatActivity {
         WeatherApi.Factory.getInstance().getWeather(url).enqueue(new Callback<Weather>() {
             @Override
             public void onResponse(Call<Weather> call, Response<Weather> response) {
+
                 if (response.body().getQuery().getCount() == 1) {
 
                     String condition=response.body().getQuery().getResults().getChannel().getItem().getCondition().getText();
@@ -223,14 +222,9 @@ public class HomeActivity extends AppCompatActivity {
 
 
                 } else {
-                    alert.setTitle(R.string.location_error)
-                            .setMessage(R.string.invalidCIty)
-                            .setPositiveButton(getString(R.string.try_different_city), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                }
-                            });
-                    alert.show();
+                    shManager.setInSharedPreferences("");
+                    doAll();
+
                 }
             }
             @Override
@@ -266,14 +260,15 @@ public class HomeActivity extends AppCompatActivity {
 
                 if (item.getItemId() == R.id.changeLocation) {
                     final EditText editText = new EditText(HomeActivity.this);
-                    alert.setTitle("City,Country");
+                    alert.setTitle("Enter City");
                     alert.setView(editText);
 
-                    alert.setPositiveButton("Change", new DialogInterface.OnClickListener() {
+                    alert.setPositiveButton("Enter", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             newCity = editText.getText().toString();
-                            Toast.makeText(HomeActivity.this, newCity, Toast.LENGTH_SHORT).show();
+                            shManager.setInSharedPreferences(newCity);
+                            doAll();
                         }
                     });
 
