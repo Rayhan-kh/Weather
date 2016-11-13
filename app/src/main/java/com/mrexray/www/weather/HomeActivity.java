@@ -18,7 +18,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mrexray.www.weather.Data.Remote.WeatherApi;
 import com.mrexray.www.weather.Data.Weather;
@@ -26,6 +25,7 @@ import com.mrexray.www.weather.Utilities.BackgroundFinder;
 import com.mrexray.www.weather.Utilities.BuildUrl;
 import com.mrexray.www.weather.Utilities.IconFinder;
 import com.mrexray.www.weather.Utilities.SharedPreferenceManager;
+import com.mrexray.www.weather.Utilities.UnitConverter;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,6 +34,7 @@ import retrofit2.Response;
 public class HomeActivity extends AppCompatActivity {
 
     private TextView tvLocation;
+    private TextView tvUnit;
     private TextView tvDate;
     private TextView tvTemp;
     private TextView tvHum;
@@ -90,6 +91,7 @@ public class HomeActivity extends AppCompatActivity {
         progress.setCancelable(false);
 
         tvLocation = (TextView) findViewById(R.id.tvLocation);
+        tvUnit = (TextView) findViewById(R.id.tvUnit);
         tvDate = (TextView) findViewById(R.id.tvDate);
         tvPressure = (TextView) findViewById(R.id.tvPressure);
         tvTemp = (TextView) findViewById(R.id.tvTemp);
@@ -111,6 +113,7 @@ public class HomeActivity extends AppCompatActivity {
         tvDescription.setTypeface(typeface);
         tvWindSp.setTypeface(typeface);
         tvHum.setTypeface(typeface);
+        tvUnit.setTypeface(typefaceReg);
 
         tvDay1 = (TextView) findViewById(R.id.tvDay1);
         tvDay2 = (TextView) findViewById(R.id.tvday2);
@@ -145,10 +148,6 @@ public class HomeActivity extends AppCompatActivity {
         tvCast7.setTypeface(typeface);
 
 
-
-
-
-
         imgIcon1 = (ImageView) findViewById(R.id.imgIcon1);
         imgIcon2 = (ImageView) findViewById(R.id.imgIcon2);
         imgIcon3 = (ImageView) findViewById(R.id.imgIcon3);
@@ -156,8 +155,6 @@ public class HomeActivity extends AppCompatActivity {
         imgIcon5 = (ImageView) findViewById(R.id.imgIcon5);
         imgIcon6 = (ImageView) findViewById(R.id.imgIcon6);
         imgIcon7 = (ImageView) findViewById(R.id.imgIcon7);
-
-
 
 
     }
@@ -170,8 +167,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    public void doAll()
-    {
+    public void doAll() {
         if (isNetworkConnected()) {
 
             newCity = shManager.getFromSharedPreference();
@@ -179,16 +175,12 @@ public class HomeActivity extends AppCompatActivity {
             if (!newCity.isEmpty()) {
                 progress.show();
                 url = buildUrl.buildUrl(newCity);
-//                layout = findViewById(R.id.activity_home);
-//                Animation animOut = AnimationUtils.loadAnimation(HomeActivity.this, R.anim.anim_out);
-//                layout.setAnimation(animOut);
-//                animOut.start();
                 setView(url);
                 progress.dismiss();
-            }
-            else {
-                final EditText editText=new EditText(this);
+            } else {
+                final EditText editText = new EditText(this);
                 alert.setTitle("Enter City")
+                        .setMessage("")
                         .setView(editText)
                         .setPositiveButton("Enter", new DialogInterface.OnClickListener() {
                             @Override
@@ -207,6 +199,7 @@ public class HomeActivity extends AppCompatActivity {
                     .setPositiveButton(R.string.tryAgain, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
+                            doAll();
                         }
                     });
             alert.show();
@@ -218,24 +211,24 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Weather> call, Response<Weather> response) {
 
-                BackgroundFinder backgroundFinder=new BackgroundFinder();
+                BackgroundFinder backgroundFinder = new BackgroundFinder();
                 if (response.body().getQuery().getCount() == 1) {
 
-                    String a=response.body().getQuery().getResults().getChannel().getItem().getCondition().getCode();
-                    int weatherCode=Integer.parseInt(a);
+                    String a = response.body().getQuery().getResults().getChannel().getItem().getCondition().getCode();
+                    int weatherCode = Integer.parseInt(a);
 
                     setBackground(backgroundFinder.findBackground(weatherCode));
 
                     tvLocation.setText(response.body().getQuery().getResults().getChannel().getLocation().getCity() + ", " +
                             response.body().getQuery().getResults().getChannel().getLocation().getCountry());
                     tvDate.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getDate());
-                    tvTemp.setText(response.body().getQuery().getResults().getChannel().getItem().getCondition().getTemp()+ "  F ");
+                    tvTemp.setText(response.body().getQuery().getResults().getChannel().getItem().getCondition().getTemp());
                     tvDescription.setText(response.body().getQuery().getResults().getChannel().getItem().getCondition().getText());
-                    tvPressure.setText("Pressure: "+response.body().getQuery().getResults().getChannel().getAtmosphere().getPressure() + " ppsi");
-                    tvHum.setText("Humidity: "+response.body().getQuery().getResults().getChannel().getAtmosphere().getHumidity() + " %");
-                    tvWindSp.setText("Wind Speed: "+response.body().getQuery().getResults().getChannel().getWind().getSpeed() + " mph");
-                    tvSunRise.setText("Sunrise: " +response.body().getQuery().getResults().getChannel().getAstronomy().getSunrise());
-                    tvSunSet.setText("Sunset: " +response.body().getQuery().getResults().getChannel().getAstronomy().getSunset());
+                    tvPressure.setText("Pressure: " + response.body().getQuery().getResults().getChannel().getAtmosphere().getPressure() + " ppsi");
+                    tvHum.setText("Humidity: " + response.body().getQuery().getResults().getChannel().getAtmosphere().getHumidity() + " %");
+                    tvWindSp.setText("Wind Speed: " + response.body().getQuery().getResults().getChannel().getWind().getSpeed() + " mph");
+                    tvSunRise.setText("Sunrise: " + response.body().getQuery().getResults().getChannel().getAstronomy().getSunrise());
+                    tvSunSet.setText("Sunset: " + response.body().getQuery().getResults().getChannel().getAstronomy().getSunset());
 
                     tvDay1.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getDay());
                     tvDay2.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(1).getDay());
@@ -253,17 +246,15 @@ public class HomeActivity extends AppCompatActivity {
                     tvCast6.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(5).getLow());
                     tvCast7.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(6).getLow());
 
-                    String i0=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
-                    String i1=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
-                    String i2=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
-                    String i3=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
-                    String i4=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
-                    String i5=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
-                    String i6=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i0 = response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i1 = response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i2 = response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i3 = response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i4 = response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i5 = response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i6 = response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
 
-                    Toast.makeText(HomeActivity.this, i3, Toast.LENGTH_SHORT).show();
-
-                    IconFinder iconFinder=new IconFinder();
+                    IconFinder iconFinder = new IconFinder();
 
                     imgIcon1.setImageResource(iconFinder.findIcon(i0));
                     imgIcon2.setImageResource(iconFinder.findIcon(i1));
@@ -274,21 +265,19 @@ public class HomeActivity extends AppCompatActivity {
                     imgIcon7.setImageResource(iconFinder.findIcon(i6));
 
 
-
-
-
-
                 } else {
                     shManager.setInSharedPreferences("");
                     doAll();
 
                 }
             }
+
             @Override
             public void onFailure(Call<Weather> call, Throwable t) {
             }
         });
     }
+
     private void setBackground(int drawableId) {
         layout = findViewById(R.id.activity_home);
         Animation anim = AnimationUtils.loadAnimation(HomeActivity.this, R.anim.anim);
@@ -318,6 +307,7 @@ public class HomeActivity extends AppCompatActivity {
                 if (item.getItemId() == R.id.changeLocation) {
                     final EditText editText = new EditText(HomeActivity.this);
                     alert.setTitle("Enter City");
+                    alert.setMessage("");
                     alert.setView(editText);
 
                     alert.setPositiveButton("Enter", new DialogInterface.OnClickListener() {
@@ -342,6 +332,50 @@ public class HomeActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+
+    public void convertUnit(View view) {
+
+        String unit = tvUnit.getText().toString();
+        String temp = tvTemp.getText().toString();
+
+        String t1 = tvCast1.getText().toString();
+        String t2 = tvCast2.getText().toString();
+        String t3 = tvCast3.getText().toString();
+        String t4 = tvCast4.getText().toString();
+        String t5 = tvCast5.getText().toString();
+        String t6 = tvCast6.getText().toString();
+        String t7 = tvCast7.getText().toString();
+
+        UnitConverter converter = new UnitConverter();
+
+        if (unit.equals("F")) {
+            tvTemp.setText(converter.convertFarToCel(temp));
+            tvUnit.setText("C");
+
+            tvCast1.setText(converter.convertFarToCel(t1));
+            tvCast2.setText(converter.convertFarToCel(t2));
+            tvCast3.setText(converter.convertFarToCel(t3));
+            tvCast4.setText(converter.convertFarToCel(t4));
+            tvCast5.setText(converter.convertFarToCel(t5));
+            tvCast6.setText(converter.convertFarToCel(t6));
+            tvCast7.setText(converter.convertFarToCel(t7));
+
+        }
+        if (unit.equals("C")) {
+            tvTemp.setText(converter.convertCelToFar(temp));
+            tvUnit.setText("F");
+
+            tvCast1.setText(converter.convertCelToFar(t1));
+            tvCast2.setText(converter.convertCelToFar(t2));
+            tvCast3.setText(converter.convertCelToFar(t3));
+            tvCast4.setText(converter.convertCelToFar(t4));
+            tvCast5.setText(converter.convertCelToFar(t5));
+            tvCast6.setText(converter.convertCelToFar(t6));
+            tvCast7.setText(converter.convertCelToFar(t7));
+
+        }
     }
 
 
