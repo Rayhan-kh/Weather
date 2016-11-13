@@ -18,11 +18,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mrexray.www.weather.Data.Remote.WeatherApi;
 import com.mrexray.www.weather.Data.Weather;
 import com.mrexray.www.weather.Utilities.BackgroundFinder;
 import com.mrexray.www.weather.Utilities.BuildUrl;
+import com.mrexray.www.weather.Utilities.IconFinder;
 import com.mrexray.www.weather.Utilities.SharedPreferenceManager;
 
 import retrofit2.Call;
@@ -251,7 +253,25 @@ public class HomeActivity extends AppCompatActivity {
                     tvCast6.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(5).getLow());
                     tvCast7.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(6).getLow());
 
+                    String i0=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i1=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i2=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i3=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i4=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i5=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
+                    String i6=response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getCode();
 
+                    Toast.makeText(HomeActivity.this, i3, Toast.LENGTH_SHORT).show();
+
+                    IconFinder iconFinder=new IconFinder();
+
+                    imgIcon1.setImageResource(iconFinder.findIcon(i0));
+                    imgIcon2.setImageResource(iconFinder.findIcon(i1));
+                    imgIcon3.setImageResource(iconFinder.findIcon(i2));
+                    imgIcon4.setImageResource(iconFinder.findIcon(i3));
+                    imgIcon5.setImageResource(iconFinder.findIcon(i4));
+                    imgIcon6.setImageResource(iconFinder.findIcon(i5));
+                    imgIcon7.setImageResource(iconFinder.findIcon(i6));
 
 
 
