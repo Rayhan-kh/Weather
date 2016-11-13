@@ -2,7 +2,7 @@ package com.mrexray.www.weather;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -10,7 +10,6 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
-import android.text.Layout;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,10 +18,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.mrexray.www.weather.ModelClasses.Remote.WeatherApi;
-import com.mrexray.www.weather.ModelClasses.Weather;
+import com.mrexray.www.weather.Data.Remote.WeatherApi;
+import com.mrexray.www.weather.Data.Weather;
+import com.mrexray.www.weather.Utilities.BackgroundFinder;
 import com.mrexray.www.weather.Utilities.BuildUrl;
 import com.mrexray.www.weather.Utilities.SharedPreferenceManager;
 
@@ -98,6 +97,19 @@ public class HomeActivity extends AppCompatActivity {
         tvSunRise = (TextView) findViewById(R.id.tvSunRise);
         tvSunSet = (TextView) findViewById(R.id.tvSunSet);
 
+        Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/gotham_light.ttf");
+        Typeface typefaceReg = Typeface.createFromAsset(getAssets(), "fonts/gotham_pro.ttf");
+
+        tvLocation.setTypeface(typefaceReg);
+        tvDate.setTypeface(typeface);
+        tvTemp.setTypeface(typefaceReg);
+        tvPressure.setTypeface(typeface);
+        tvSunRise.setTypeface(typeface);
+        tvSunSet.setTypeface(typeface);
+        tvDescription.setTypeface(typeface);
+        tvWindSp.setTypeface(typeface);
+        tvHum.setTypeface(typeface);
+
         tvDay1 = (TextView) findViewById(R.id.tvDay1);
         tvDay2 = (TextView) findViewById(R.id.tvday2);
         tvDay3 = (TextView) findViewById(R.id.tvDay3);
@@ -106,6 +118,14 @@ public class HomeActivity extends AppCompatActivity {
         tvDay6 = (TextView) findViewById(R.id.tvDay6);
         tvDay7 = (TextView) findViewById(R.id.tvDay7);
 
+        tvDay1.setTypeface(typeface);
+        tvDay2.setTypeface(typeface);
+        tvDay3.setTypeface(typeface);
+        tvDay4.setTypeface(typeface);
+        tvDay5.setTypeface(typeface);
+        tvDay6.setTypeface(typeface);
+        tvDay7.setTypeface(typeface);
+
         tvCast1 = (TextView) findViewById(R.id.tvCast1);
         tvCast2 = (TextView) findViewById(R.id.tvCast2);
         tvCast3 = (TextView) findViewById(R.id.tvCast3);
@@ -113,6 +133,19 @@ public class HomeActivity extends AppCompatActivity {
         tvCast5 = (TextView) findViewById(R.id.tvCast5);
         tvCast6 = (TextView) findViewById(R.id.tvCast6);
         tvCast7 = (TextView) findViewById(R.id.tvCast7);
+
+        tvCast1.setTypeface(typeface);
+        tvCast2.setTypeface(typeface);
+        tvCast3.setTypeface(typeface);
+        tvCast4.setTypeface(typeface);
+        tvCast5.setTypeface(typeface);
+        tvCast6.setTypeface(typeface);
+        tvCast7.setTypeface(typeface);
+
+
+
+
+
 
         imgIcon1 = (ImageView) findViewById(R.id.imgIcon1);
         imgIcon2 = (ImageView) findViewById(R.id.imgIcon2);
@@ -144,10 +177,10 @@ public class HomeActivity extends AppCompatActivity {
             if (!newCity.isEmpty()) {
                 progress.show();
                 url = buildUrl.buildUrl(newCity);
-                layout = findViewById(R.id.activity_home);
-                Animation animOut = AnimationUtils.loadAnimation(HomeActivity.this, R.anim.anim_out);
-                layout.setAnimation(animOut);
-                animOut.start();
+//                layout = findViewById(R.id.activity_home);
+//                Animation animOut = AnimationUtils.loadAnimation(HomeActivity.this, R.anim.anim_out);
+//                layout.setAnimation(animOut);
+//                animOut.start();
                 setView(url);
                 progress.dismiss();
             }
@@ -183,11 +216,13 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Weather> call, Response<Weather> response) {
 
+                BackgroundFinder backgroundFinder=new BackgroundFinder();
                 if (response.body().getQuery().getCount() == 1) {
 
-                    String condition=response.body().getQuery().getResults().getChannel().getItem().getCondition().getText();
-                    int drawableId=R.drawable.rainy;
-                    setBackground(drawableId);
+                    String a=response.body().getQuery().getResults().getChannel().getItem().getCondition().getCode();
+                    int weatherCode=Integer.parseInt(a);
+
+                    setBackground(backgroundFinder.findBackground(weatherCode));
 
                     tvLocation.setText(response.body().getQuery().getResults().getChannel().getLocation().getCity() + ", " +
                             response.body().getQuery().getResults().getChannel().getLocation().getCountry());
@@ -200,7 +235,7 @@ public class HomeActivity extends AppCompatActivity {
                     tvSunRise.setText("Sunrise: " +response.body().getQuery().getResults().getChannel().getAstronomy().getSunrise());
                     tvSunSet.setText("Sunset: " +response.body().getQuery().getResults().getChannel().getAstronomy().getSunset());
 
-                    tvDay1.setText(R.string.todat);
+                    tvDay1.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(0).getDay());
                     tvDay2.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(1).getDay());
                     tvDay3.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(2).getDay());
                     tvDay4.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(3).getDay());
@@ -215,6 +250,8 @@ public class HomeActivity extends AppCompatActivity {
                     tvCast5.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(4).getLow());
                     tvCast6.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(5).getLow());
                     tvCast7.setText(response.body().getQuery().getResults().getChannel().getItem().getForecast().get(6).getLow());
+
+
 
 
 
