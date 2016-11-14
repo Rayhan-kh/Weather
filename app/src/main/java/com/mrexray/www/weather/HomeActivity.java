@@ -177,6 +177,7 @@ public class HomeActivity extends AppCompatActivity {
                 url = buildUrl.buildUrl(newCity);
                 setView(url);
                 progress.dismiss();
+                tvUnit.setText("F");
             } else {
                 final EditText editText = new EditText(this);
                 alert.setTitle("Enter City")
