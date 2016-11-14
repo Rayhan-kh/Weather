@@ -11,7 +11,6 @@ import retrofit2.http.Url;
 /**
  * Created by Ray on 11/12/2016.
  */
-
 public interface WeatherApi {
 
     String BASE_URL = "https://query.yahooapis.com/v1/public/";
